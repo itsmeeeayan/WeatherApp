@@ -1,100 +1,153 @@
 import streamlit as st
+import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import time
 
-# -------------------------------
-# Dummy Machine Learning Model
-# -------------------------------
-# In a real-world app, you might load a pre-trained ML model using joblib or pickle:
-#   from joblib import load
-#   model = load('weather_model.joblib')
-#
-# For this demo, we create a dummy prediction function.
-def predict_weather(temp, humidity, wind_speed):
-    """
-    Dummy ML function to simulate weather forecast.
-    It takes in temperature (°C), humidity (%), and wind speed (km/h) and
-    returns a forecast string along with a confidence score.
-    """
-    # Here we compute a dummy "score" using an arbitrary formula.
-    score = 0.3 * temp + 0.4 * (100 - humidity) + 0.3 * wind_speed
-
-    # Use some simple rules to decide a forecast.
-    if humidity > 70:
-        forecast = "Rainy"
-    elif temp > 25 and humidity < 50:
-        forecast = "Sunny"
-    elif 15 <= temp <= 25:
-        forecast = "Cloudy"
-    else:
-        forecast = "Mixed"
-
-    # For demonstration, we return both the forecast and the dummy score.
-    return forecast, score
-
-# -------------------------------
-# Weather Forecast Streamlit App
-# -------------------------------
-st.title("Weather Forecast Web App")
-st.write("""
-This app uses a simple (dummy) machine learning model to predict the weather forecast based on user inputs.
-Enter the values for temperature, humidity, and wind speed to get a forecast!
-""")
-
-# Sidebar for inputs:
-st.sidebar.header("Input Weather Parameters")
-temperature = st.sidebar.slider("Temperature (°C)", -10, 40, 20)
-humidity = st.sidebar.slider("Humidity (%)", 0, 100, 50)
-wind_speed = st.sidebar.slider("Wind Speed (km/h)", 0, 50, 10)
-
-# Button to generate a forecast:
-if st.button("Predict Weather"):
-    with st.spinner("Predicting..."):
-        # Simulate computation delay
-        time.sleep(1)
-        forecast, score = predict_weather(temperature, humidity, wind_speed)
-    
-    st.success("Prediction complete!")
-    st.subheader("Forecast Results")
-    st.write(f"**Forecast:** {forecast}")
-    st.write(f"**Confidence Score:** {score:.2f}")
-
-# -------------------------------
-# Optional: Display Weather Forecast Animation
-# -------------------------------
-# Here we simulate an animation of a weather forecast "evolution" 
-# by showing a sequence of images that represent weather conditions.
-st.markdown("---")
-st.header("Weather Forecast Animation (Demo)")
+st.title("Weather Forecast Web App using Machine Learning")
 
 st.write("""
-Below is a demo animation (images) that you can run to see a simulated forecast update.
-For a real application, you could replace these images with weather icons or maps that match your forecast.
+This app uses a machine learning model to forecast temperature based on weather parameters.
+It trains both a Linear Regression model and a Decision Tree model on a sample dataset and displays the results.
 """)
 
-animation_speed = st.slider("Animation Speed (seconds per frame)", 0.1, 2.0, 1.0)
+# ------------------------------
+# Data Preparation
+# ------------------------------
 
-# Dummy image paths (update with your own image files if available)
-# For example, create image files named "sunny.png", "cloudy.png", "rainy.png", etc.
-weather_images = {
-    "Sunny": "sunny.png",
-    "Cloudy": "cloudy.png",
-    "Rainy": "rainy.png",
-    "Mixed": "mixed.png"
+st.subheader("Data Loading and Preprocessing")
+
+# Generate sample weather data
+data = {
+    'date': pd.date_range(start='2020-01-01', periods=365),
+    'temperature': np.random.randint(-10, 40, 365),
+    'humidity': np.random.randint(20, 100, 365),
+    'pressure': np.random.randint(980, 1040, 365),
+    'precipitation': np.random.rand(365) * 10,
+    'wind_speed': np.random.rand(365) * 30
 }
 
-# Button to start the animation:
-if st.button("Start Weather Animation"):
-    forecast_images = []
-    # Create a simple sequence by repeating the predicted condition.
-    # In a more complex app you might have multiple frames.
-    if forecast in weather_images:
-        forecast_images = [weather_images[forecast]] * 5
-    else:
-        forecast_images = [weather_images["Mixed"]] * 5
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'])
+df['day_of_year'] = df['date'].dt.dayofyear
 
-    placeholder = st.empty()
-    for img_file in forecast_images:
-        placeholder.image(img_file, use_container_width=True)
-        time.sleep(animation_speed)
-    st.success("Animation complete!")
+st.write("### Sample Data")
+st.write(df.head())
+
+# Feature Engineering
+X = df[['day_of_year', 'humidity', 'pressure', 'precipitation', 'wind_speed']]
+y = df['temperature']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+st.write("Data is split into training (80%) and testing (20%) sets.")
+
+# ------------------------------
+# Linear Regression Model
+# ------------------------------
+
+st.subheader("Training Linear Regression Model")
+
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
+lr_predictions = lr_model.predict(X_test)
+
+lr_mae = mean_absolute_error(y_test, lr_predictions)
+lr_mse = mean_squared_error(y_test, lr_predictions)
+lr_r2  = r2_score(y_test, lr_predictions)
+
+st.write("**Linear Regression Metrics:**")
+st.write(f"MAE: {lr_mae:.2f}")
+st.write(f"MSE: {lr_mse:.2f}")
+st.write(f"R² Score: {lr_r2:.2f}")
+
+# ------------------------------
+# Decision Tree Model
+# ------------------------------
+
+st.subheader("Training Decision Tree Model")
+
+dt_model = DecisionTreeRegressor(random_state=42)
+dt_model.fit(X_train, y_train)
+dt_predictions = dt_model.predict(X_test)
+
+dt_mae = mean_absolute_error(y_test, dt_predictions)
+dt_mse = mean_squared_error(y_test, dt_predictions)
+dt_r2  = r2_score(y_test, dt_predictions)
+
+st.write("**Decision Tree Metrics:**")
+st.write(f"MAE: {dt_mae:.2f}")
+st.write(f"MSE: {dt_mse:.2f}")
+st.write(f"R² Score: {dt_r2:.2f}")
+
+# ------------------------------
+# Visualization
+# ------------------------------
+
+st.subheader("Model Predictions vs Actual Temperature")
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+
+# Linear Regression Predictions Plot
+ax[0].scatter(y_test, lr_predictions, alpha=0.5)
+ax[0].plot([y.min(), y.max()], [y.min(), y.max()], 'k--')
+ax[0].set_xlabel('Actual Temperature')
+ax[0].set_ylabel('Predicted Temperature')
+ax[0].set_title('Linear Regression Predictions')
+
+# Decision Tree Predictions Plot
+ax[1].scatter(y_test, dt_predictions, alpha=0.5, color='green')
+ax[1].plot([y.min(), y.max()], [y.min(), y.max()], 'k--')
+ax[1].set_xlabel('Actual Temperature')
+ax[1].set_ylabel('Predicted Temperature')
+ax[1].set_title('Decision Tree Predictions')
+
+st.pyplot(fig, use_container_width=True)
+
+# Feature Importance for Decision Tree
+st.subheader("Decision Tree Feature Importance")
+feature_importance = pd.Series(
+    dt_model.feature_importances_,
+    index=X.columns
+).sort_values(ascending=False)
+st.write(feature_importance)
+
+# ------------------------------
+# Optional: Forecast for a Given Day
+# ------------------------------
+
+st.subheader("Weather Forecast Prediction Demo")
+
+st.write("Enter weather parameters to get a temperature forecast.")
+
+# Sidebar inputs for prediction
+day_of_year = st.slider("Day of Year", 1, 365, 200)
+humidity = st.slider("Humidity (%)", 0, 100, 50)
+pressure = st.slider("Pressure (hPa)", 980, 1040, 1013)
+precipitation = st.slider("Precipitation (mm)", 0.0, 10.0, 2.0)
+wind_speed = st.slider("Wind Speed (km/h)", 0.0, 30.0, 10.0)
+
+# Create a DataFrame for prediction
+input_data = pd.DataFrame({
+    'day_of_year': [day_of_year],
+    'humidity': [humidity],
+    'pressure': [pressure],
+    'precipitation': [precipitation],
+    'wind_speed': [wind_speed]
+})
+
+model_choice = st.selectbox("Select Model for Prediction", ["Linear Regression", "Decision Tree"])
+
+if st.button("Predict Temperature"):
+    if model_choice == "Linear Regression":
+        prediction = lr_model.predict(input_data)[0]
+    else:
+        prediction = dt_model.predict(input_data)[0]
+    st.success(f"Predicted Temperature: {prediction:.2f} °C")
