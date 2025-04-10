@@ -25,12 +25,7 @@ st.set_page_config(
 # Apply a custom background image
 # -------------------------------------------------
 def set_bg_image():
-    """
-    Injects CSS code in the Streamlit app to set a full-page background image.
-    Replace the URL below with your own hosted image link or local base64-encoded image.
-    """
     st.markdown(
-        f"""
         <style>
         .stApp {{
             background: "Background.jpg";
@@ -40,8 +35,7 @@ def set_bg_image():
             background-position: center;
         }}
         </style>
-        """,
-        unsafe_allow_html=True
+       
     )
 
 # Call the function to set the background image
