@@ -12,13 +12,44 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-# Set page configuration
+# -------------------------------------------------
+# Set page config
+# -------------------------------------------------
 st.set_page_config(
     page_title="Kolkata Weather Forecast",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# -------------------------------------------------
+# Apply a custom background image
+# -------------------------------------------------
+def set_bg_image():
+    """
+    Injects CSS code in the Streamlit app to set a full-page background image.
+    Replace the URL below with your own hosted image link or local base64-encoded image.
+    """
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background: "Background.jpg";
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call the function to set the background image
+set_bg_image()
+
+# -------------------------------------------------
+# Data Loading and Preprocessing
+# -------------------------------------------------
 def load_and_preprocess_data(file):
     try:
         df = pd.read_csv(file)
@@ -43,10 +74,13 @@ def load_and_preprocess_data(file):
     
     return df
 
+# -------------------------------------------------
+# Main App
+# -------------------------------------------------
 def main():
     st.title("🌤️ Kolkata Weather Forecasting Web App")
     st.markdown("""
-    This interactive app uses machine learning to predict temperatures in Kolkata.
+    This interactive app uses machine learning to predict temperatures (in °F) in Kolkata.
     Two models are trained on historical weather data:
     - **Linear Regression**
     - **Decision Tree Regressor**
@@ -212,6 +246,6 @@ def main():
     
     else:
         st.info("👈 Please upload a CSV file to get started with the weather forecast data.")
-    
+
 if __name__ == "__main__":
     main()
