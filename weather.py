@@ -40,7 +40,7 @@ def set_bg_image():
     )
 
 # Call the function to set the background image
-set_bg_image()
+
 
 # -------------------------------------------------
 # Data Loading and Preprocessing
@@ -73,6 +73,7 @@ def load_and_preprocess_data(file):
 # Main App
 # -------------------------------------------------
 def main():
+    set_bg_image()
     st.title("🌤️ Kolkata Weather Forecasting Web App")
     st.markdown("""
     This interactive app uses machine learning to predict temperatures (in °F) in Kolkata.
