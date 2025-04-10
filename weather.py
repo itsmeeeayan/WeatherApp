@@ -29,7 +29,7 @@ def set_bg_image():
         f"""
         <style>
         .stApp {{
-            background-image: url("Background.jpg");
+            background-image: url("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.weathercompany.com%2Fproven-accuracy%2F&psig=AOvVaw1OKyQpHn4nvpeotaJVSDGu&ust=1744404631728000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCIiq8pOszowDFQAAAAAdAAAAABAE");
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
