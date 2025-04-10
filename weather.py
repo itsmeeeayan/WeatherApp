@@ -25,17 +25,18 @@ st.set_page_config(
 # Apply a custom background image
 # -------------------------------------------------
 def set_bg_image():
-    st.markdown(
+    st.markdown("""
         <style>
         .stApp {{
-            background: "Background.jpg";
+            background: url("Background.jpg");
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-position: center;
         }}
         </style>
-       
+       """, 
+        unsafe_allow_html=True
     )
 
 # Call the function to set the background image
