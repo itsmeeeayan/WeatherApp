@@ -29,7 +29,7 @@ def set_bg_image():
         f"""
         <style>
         .stApp {{
-            background-image: url("https://images.pexels.com/photos/907485/pexels-photo-907485.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
+            background-image: url("https://images.pexels.com/photos/1470589/pexels-photo-1470589.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
