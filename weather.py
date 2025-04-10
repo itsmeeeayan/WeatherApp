@@ -25,17 +25,37 @@ st.set_page_config(
 # Apply a custom background image
 # -------------------------------------------------
 def set_bg_image():
-    st.markdown("""
+    st.markdown(
+        f"""
         <style>
         .stApp {{
-            background: url("https://cdn.pixabay.com/photo/2017/06/13/12/26/pine-2398231_1280.jpg");
+            background-image: url("https://cdn.pixabay.com/photo/2017/06/13/12/26/pine-2398231_1280.jpg");
             background-size: cover;
             background-repeat: no-repeat;
+            background-position: center center;
             background-attachment: fixed;
-            background-position: center;
+        }}
+        
+        /* Add overlay for better text visibility */
+        .stApp::before {{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: -1;
+        }}
+        
+        /* Ensure content stays on top */
+        .main .block-container {{
+            position: relative;
+            z-index: 1;
+            background: transparent;
         }}
         </style>
-       """, 
+        """,
         unsafe_allow_html=True
     )
 
