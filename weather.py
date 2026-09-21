@@ -125,10 +125,10 @@ def main():
             st.subheader("Data Overview")
             st.write(df.head())
 
-    with st.expander("📊 SQL analytics (served from SQLite)"):
-        for name in ("monthly_summary", "condition_breakdown", "rolling_trend"):
-            st.markdown(f"**{name.replace('_', ' ').title()}**")
-            st.dataframe(query(DB_PATH, name))
+            with st.expander("📊 SQL analytics (served from SQLite)"):
+                for name in ("monthly_summary", "condition_breakdown", "rolling_trend"):
+                    st.markdown(f"**{name.replace('_', ' ').title()}**")
+                    st.dataframe(query(DB_PATH, name))
 
             # Let user select test set size and Decision Tree depth via sidebar
             test_size = st.sidebar.slider("Test Set Size (%)", 10, 40, 20)
