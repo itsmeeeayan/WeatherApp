@@ -65,9 +65,20 @@ def set_bg_image():
 # -------------------------------------------------
 # Data Loading and Preprocessing
 # -------------------------------------------------
+import tempfile
+from pathlib import Path
+from weather_db import run_etl, load_training_frame, query
+
+DB_PATH = Path(tempfile.gettempdir()) / "weather.db"
+
 def load_and_preprocess_data(file):
+    """Load the uploaded CSV through the ETL into SQLite, then read it back."""
     try:
-        df = pd.read_csv(file)
+        tmp_csv = Path(tempfile.gettempdir()) / "weather_upload.csv"
+        tmp_csv.write_bytes(file.getvalue())
+        run_etl(tmp_csv, DB_PATH, rebuild=True)
+        df = load_training_frame(DB_PATH)
+        return df.rename(columns={"precip_flag": "precipitation_flag"})
     except Exception as e:
         st.error(f"Error loading file: {e}")
         return None
@@ -113,6 +124,11 @@ def main():
         if df is not None:
             st.subheader("Data Overview")
             st.write(df.head())
+
+    with st.expander("📊 SQL analytics (served from SQLite)"):
+        for name in ("monthly_summary", "condition_breakdown", "rolling_trend"):
+            st.markdown(f"**{name.replace('_', ' ').title()}**")
+            st.dataframe(query(DB_PATH, name))
 
             # Let user select test set size and Decision Tree depth via sidebar
             test_size = st.sidebar.slider("Test Set Size (%)", 10, 40, 20)
